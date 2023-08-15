@@ -62,7 +62,16 @@ The new procedure calls the callback before executing the regular window procedu
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>hwnd</code></strong></dt>
-<dd>Window id (HWND)</dd>
+<dd>
+<p>Window handle (HWND)
+This can be obtained from various libraries that open windows, such as</p>
+<ul>
+<li><code>window.winfo_id()</code> in <code>tkinter</code></li>
+<li><code>pygame.display.get_wm_info()['window']</code> in PyGame</li>
+<li>Most functions in win32gui</li>
+<li><code>fig.canvas.manager.window.winId()</code> in matplotlib using PyQt5</li>
+</ul>
+</dd>
 <dt><strong><code>callback</code></strong></dt>
 <dd>Function</dd>
 <dt><strong><code>device_types</code></strong></dt>
@@ -84,7 +93,14 @@ The new procedure calls the callback before executing the regular window procedu
     The HWND can be retrieved from a TK instance using `window.winfo_id()` and similar functions exist for other libraries.
 
     Args:
-        hwnd: Window id (HWND)
+        hwnd: Window handle (HWND)
+            This can be obtained from various libraries that open windows, such as
+
+            * `window.winfo_id()` in `tkinter`
+            * `pygame.display.get_wm_info()[&#39;window&#39;]` in PyGame
+            * Most functions in win32gui
+            * `fig.canvas.manager.window.winId()` in matplotlib using PyQt5
+
         callback: Function
         device_types: Types of devices to listen for. Supports &#39;keyboard&#39; and &#39;mouse&#39;.
     &#34;&#34;&#34;
