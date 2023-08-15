@@ -1,0 +1,55 @@
+name: Update Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+        
+      - name: Install dependencies 🔧
+        run: |
+          pip install --quiet pdoc3 
+          pip install .
+          pip list
+        
+      - name: Build API with pdoc3
+        run: pdoc --html --output-dir docs --force winrawin
+
+      - name: Upload Artifacts 🔺 # The project is then uploaded as an artifact named 'site'.
+        uses: actions/upload-artifact@v1
+        with:
+          name: site
+          path: docs
+
+  deploy:
+      concurrency: ci-${{ github.ref }}
+      needs: [build] # The second job must depend on the first one to complete before running and uses ubuntu-latest instead of windows.
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+      steps:
+        - name: Checkout 🛎️
+          uses: actions/checkout@v3
+
+        - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
+          uses: actions/download-artifact@v1
+          with:
+            name: site
+
+        - name: Deploy 🚀
+          uses: JamesIves/github-pages-deploy-action@v4
+          with:
+            folder: 'site' # The deployment folder should match the name of the artifact. Even though our project builds into the 'build' folder the artifact name of 'site' must be placed here.
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            branch: gh-pages # The branch the action should deploy to.
