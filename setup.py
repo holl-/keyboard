@@ -1,7 +1,9 @@
 from setuptools import setup
 
-long_description = """# win-raw-in
+long_description = """
 Enumerate raw input devices and receive input events with device ID on Windows.
+
+Homepage: https://github.com/holl-/win-raw-in
 """
 
 setup(

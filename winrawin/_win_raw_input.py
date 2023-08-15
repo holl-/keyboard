@@ -4,11 +4,9 @@ This is error-prone and can introduce very unpythonic failure modes, such as seg
 But it is also dependency-free, very performant well documented on Microsoft's website and scattered examples.
 """
 import ctypes
-import time
 from ctypes import c_short, c_uint8, c_int, c_uint, c_long, Structure, CFUNCTYPE, POINTER, WINFUNCTYPE, byref, sizeof, Union, c_ushort
 from ctypes.wintypes import WORD, DWORD, BOOL, HHOOK, MSG, LPWSTR, WCHAR, WPARAM, LPARAM, LONG, USHORT, HWND, UINT, HANDLE, LPCWSTR, ULONG, BYTE, HMENU, HINSTANCE, LPVOID, INT
-from dataclasses import dataclass
-from typing import Callable, Optional, Tuple
+from typing import Callable
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
@@ -151,11 +149,11 @@ class RAWKEYBOARD(Structure):
     ]
 
 
-class RAWHID(Structure):
+class RAWHID(Structure):  # https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-rawhid
     _fields_ = [
         ("dwSizeHid", DWORD),
         ("dwCount", DWORD),
-        ("bRawData", BYTE),
+        ("bRawData", BYTE * 1),
     ]
 
 
@@ -830,7 +828,7 @@ USAGE_PAGE_NAMES = {
 }
 
 
-def get_raw_input_device_list() -> ctypes.Array[RAWINPUTDEVICELIST]:
+def get_raw_input_device_list() -> ctypes.Array:
     device_count = ctypes.c_uint()
     if GetRawInputDeviceList(None, device_count, ctypes.sizeof(RAWINPUTDEVICELIST)) == -1:
         raise ctypes.WinError()

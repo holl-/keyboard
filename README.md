@@ -23,7 +23,7 @@ for device in winrawin.list_devices():
     if isinstance(device, winrawin.Mouse):
         print(f"{device.mouse_type} name='{device.name}'")
     if isinstance(device, winrawin.Keyboard):
-        print(f"{device.kb_type} with {device.num_keys} keys name='{device.name}'")
+        print(f"{device.keyboard_type} with {device.num_keys} keys name='{device.name}'")
 ```
 
 ### Raw Input Events

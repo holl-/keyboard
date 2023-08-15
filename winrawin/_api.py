@@ -1,18 +1,45 @@
+import time
+from dataclasses import dataclass
+from typing import Optional, Sequence
+
 from ._win_raw_input import *
 
 
 @dataclass
 class RawInputDevice:
+    """
+    Base class for input devices.
+
+    There are three types of raw input devices:
+
+    * `Mouse`
+    * `Keyboard`
+    * `HID`
+    """
     handle: int
+    """Windows handle for the device. This is valid only in the current session. For a unique identifier, use `name`."""
     name: str
+    """Unique device identifier."""
 
     def is_connected(self):
+        """
+        Checks whether the handle associated with this device is still valid.
+        If not, the device has most likely been disconnected.
+        """
         return is_connected(self.handle)
 
 
 @dataclass
 class Keyboard(RawInputDevice):
-    kb_type: str
+    """
+    Keyboards send events when a key is pressed, released or while a key is being held.
+    All events have either `event_type='down'` for key pressed/held or `event_type='up'` for key released.
+    The `RawInputEvent.code` denotes the scan code and `RawInputEvent.name` the human-readable name of the key.
+    If a keypad key is pressed, the `RawInputEvent.device_type` is set to `'keypad'`.
+
+    This class inherits the method `RawInputDevice.is_connected()`.
+    """
+    keyboard_type: str
     subtype: int
     scan_code_mode: int
     num_function_keys: int
@@ -28,9 +55,25 @@ class Keyboard(RawInputDevice):
 
 @dataclass
 class Mouse(RawInputDevice):
-    mouse_type: str  # HID mouse, HID wheel mouse, Mouse with horizontal wheel, unknown
+    """
+    Mice can send the following event types:
+
+    * `'down'` when a button is pressed
+    * `'up'` when a button is released
+    * `'move'` when the mouse is moved
+    * `'wheel-up'` when the mouse is turned upwards
+    * `'wheel-down'` when the mouse is turned down
+
+    In case of `move` events, `RawInputEvent.delta_x` and `RawInputEvent.delta_y` hold the amount by which the mouse moved.
+    For button events, `code` denotes the button index and `name` stores the human-readable button name.
+
+    This class inherits the method `RawInputDevice.is_connected()`.
+    """
+    mouse_type: str
+    """HID mouse, HID wheel mouse, Mouse with horizontal wheel, unknown"""
     num_buttons: int
-    sample_rate: Optional[int]  # data points per second (if available)
+    sample_rate: Optional[int]
+    """data points per second (if available)"""
     has_horizontal_wheel: bool
 
     def __hash__(self):
@@ -42,6 +85,13 @@ class Mouse(RawInputDevice):
 
 @dataclass
 class HID(RawInputDevice):
+    """
+    HID devices that are neither classified as keyboard nor mouse.
+    These devices send raw data as bytes, stored in `RawInputEvent.data`.
+    All input events are classified as `event_type='data'`.
+
+    This class inherits the method `RawInputDevice.is_connected()`.
+    """
     vendor_id: int
     product_id: int
     version_number: int
@@ -60,7 +110,16 @@ class HID(RawInputDevice):
 CACHED_DEVICES = {}  # handle -> RawInputDevice
 
 
-def list_devices():
+def list_devices() -> Sequence[RawInputDevice]:
+    """
+    Retrieves a list of all currently registered raw input devices using `GetRawInputDeviceList`.
+    For each device, this function also looks up its unique name and additional information.
+
+    All discovered devices are cached by their `handle` which is unique during this session.
+
+    Returns:
+        Devices as sequence of `RawInputDevice`
+    """
     devices = [get_device(dev.dwType, dev.hDevice) for dev in get_raw_input_device_list()]
     CACHED_DEVICES.clear()
     CACHED_DEVICES.update({d.handle: d for d in devices})
@@ -103,15 +162,29 @@ def get_device(dw_type: int, handle: int) -> RawInputDevice:
 
 @dataclass
 class RawInputEvent:
-    event_type: str  # 'up'/'down' for buttons, 'move' for mouse
-    code: int  # button index or scan code
-    name: Optional[str]  # mouse button or key name
-    device_type: str  # 'keyboard', 'keypad', 'mouse', 'controller'
+    """
+    These events are sent to the callback registered via `hook_raw_input_for_window()`.
+    """
+    event_type: str
+    """'up'/'down' for buttons, 'move' for mouse, 'data' for HID"""
+    code: int
+    """button index or scan code, -1 for HID"""
+    name: Optional[str]
+    """mouse button or key name"""
+    device_type: str
+    """'keyboard', 'keypad', 'mouse', 'controller'"""
     device: RawInputDevice
-    delta_x: Optional[int]  # mouse movement
-    delta_y: Optional[int]  # mouse movement
-    hwnd: int  # window id
-    time: float  # time of the event measured vis time.perf_counter()
+    """Source `RawInputDevice`"""
+    delta_x: Optional[int]
+    """Horizontal mouse movement"""
+    delta_y: Optional[int]
+    """Vertical mouse movement"""
+    hwnd: int
+    """Window handle of the window this event was sent to"""
+    time: float
+    """Time of the event measured vis `time.perf_counter()`"""
+    data: Optional[bytes]
+    """Raw data sent by HID devices"""
 
 
 def hook_raw_input_for_window(hwnd,
@@ -126,7 +199,14 @@ def hook_raw_input_for_window(hwnd,
     The HWND can be retrieved from a TK instance using `window.winfo_id()` and similar functions exist for other libraries.
 
     Args:
-        hwnd: Window id (HWND)
+        hwnd: Window handle (HWND)
+            This can be obtained from various libraries that open windows, such as
+
+            * `window.winfo_id()` in `tkinter`
+            * `pygame.display.get_wm_info()['window']` in PyGame
+            * Most functions in win32gui
+            * `fig.canvas.manager.window.winId()` in matplotlib using PyQt5
+
         callback: Function
         device_types: Types of devices to listen for. Supports 'keyboard' and 'mouse'.
     """
@@ -150,15 +230,22 @@ def hook_raw_input_for_window(hwnd,
                 else:
                     key_name, is_keypad = KEY_NAMES_LOWER[scan_code], False
                 evt_type = KEY_EVENT_TYPE[message]
-                event = RawInputEvent(evt_type, scan_code, key_name, 'keypad' if is_keypad else 'keyboard', device, None, None, hwnd, event_time)
+                event = RawInputEvent(evt_type, scan_code, key_name, 'keypad' if is_keypad else 'keyboard', device, None, None, hwnd, event_time, None)
             elif raw.header.dwType == 0:  # Mouse
                 assert dwSize.value == 48
                 button = raw.data.mouse.ulButtons
                 if button == 0:
-                    event = RawInputEvent('move', -1, None, 'mouse', device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time)
+                    event = RawInputEvent('move', -1, None, 'mouse', device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time, None)
                 else:
                     evt_type, button_id, button_name = MOUSE_BUTTONS[button]
-                    event = RawInputEvent(evt_type, button_id, button_name, 'mouse', device, None, None, hwnd, event_time)
+                    event = RawInputEvent(evt_type, button_id, button_name, 'mouse', device, None, None, hwnd, event_time, None)
+            elif raw.header.dwType == 2:  # Controller
+                size_hid = raw.data.hid.dwSizeHid  # The size, in bytes, of each HID input in bRawData.
+                count = raw.data.hid.dwCount  # The number of HID inputs in bRawData.
+                raw_data = raw.data.hid.bRawData  # The raw input data, as an array of bytes.
+                raw_data_ptr = ctypes.cast(raw_data, POINTER(BYTE * (size_hid * count)))
+                raw_data_bytes = ctypes.string_at(raw_data_ptr, sizeof(raw_data_ptr.contents))
+                event = RawInputEvent('data', -1, f'{count} x {size_hid} bytes', 'hid', device, None, None, hwnd, event_time, raw_data_bytes)
             else:
                 raise NotImplementedError
             callback(event)
