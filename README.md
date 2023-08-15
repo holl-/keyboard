@@ -4,9 +4,22 @@ win-raw-in
 
 Enumerate raw input devices and receive input events with device ID on Windows.
 
+Win-raw-in works by hooking into a window procedure to intercept events.
+This requires your application to open a window and obtain the corresponding hwnd.
+This can be done using `ctypes` or `win32gui` or using a high-level library such as `tkinter` (see example below).
+
+For more documentation, see the [🔗 API](https://holl-.github.io/win-raw-in/winrawin/).
+
 ## Installation
 
-Installation with pip:
+Get the latest stable version with pip:
+
+```bash
+pip install win-raw-in
+```
+
+
+Get the latest (possible unstable) version:
 
 ```bash
 pip install git+https://github.com/holl-/win-raw-in.git
@@ -14,7 +27,10 @@ pip install git+https://github.com/holl-/win-raw-in.git
 
 ## Examples
 
-### List devices
+### List input devices
+
+This example uses [`list_devices()`](https://holl-.github.io/win-raw-in/winrawin/#winrawin.list_devices) to enumerate all raw input devices registered with Windows.
+Each device is an instance of [`RawInputDevice`](https://holl-.github.io/win-raw-in/winrawin/#winrawin.RawInputDevice).
 
 ```python
 import winrawin
@@ -26,7 +42,10 @@ for device in winrawin.list_devices():
         print(f"{device.keyboard_type} with {device.num_keys} keys name='{device.name}'")
 ```
 
-### Raw Input Events
+### Listen to input events
+
+This example uses `tkinter` to open a window and retrieve the hwnd.
+Then, [`hook_raw_input_for_window()`](https://holl-.github.io/win-raw-in/winrawin/#winrawin.hook_raw_input_for_window) is used to intercept [`RawInputEvents`](https://holl-.github.io/win-raw-in/winrawin/#winrawin.RawInputEvent).
 
 ```python
 import winrawin
@@ -45,8 +64,10 @@ winrawin.hook_raw_input_for_window(window.winfo_id(), handle_event)
 window.mainloop()
 ```
 
+For a more interactive demo, see [tk_device_monitor.py](examples/tk_device_monitor.py).
+
 
 ## Related Packages
 
 This package was inspired by the [keyboard](https://github.com/boppreh/keyboard/tree/windows-device-id) package.
-Unfortunately, it does not distinguish between multiple input devices on Windows.
+Unfortunately, `keyboard` does not distinguish between multiple input devices on Windows.
