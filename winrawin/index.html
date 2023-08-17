@@ -218,7 +218,7 @@ class HID(RawInputDevice):
     usage_name: str
 
     def __hash__(self):
-        return self.handle
+        return self.handle or 0
 
     def __eq__(self, other):
         return isinstance(other, HID) and other.handle == self.handle</code></pre>
@@ -291,7 +291,7 @@ class Keyboard(RawInputDevice):
     num_keys: int
 
     def __hash__(self):
-        return self.handle
+        return self.handle or 0
 
     def __eq__(self, other):
         return isinstance(other, Keyboard) and other.handle == self.handle</code></pre>
@@ -372,7 +372,7 @@ class Mouse(RawInputDevice):
     has_horizontal_wheel: bool
 
     def __hash__(self):
-        return self.handle
+        return self.handle or 0
 
     def __eq__(self, other):
         return isinstance(other, Mouse) and other.handle == self.handle</code></pre>
@@ -412,7 +412,9 @@ class Mouse(RawInputDevice):
 <li><code><a title="winrawin.Mouse" href="#winrawin.Mouse">Mouse</a></code></li>
 <li><code><a title="winrawin.Keyboard" href="#winrawin.Keyboard">Keyboard</a></code></li>
 <li><code><a title="winrawin.HID" href="#winrawin.HID">HID</a></code></li>
-</ul></div>
+</ul>
+<p>Some devices cannot be identified, e.g. events caused by software.
+Then the devices stores an invalid handle and has <code>name='unknown'</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -427,6 +429,9 @@ class RawInputDevice:
     * `Mouse`
     * `Keyboard`
     * `HID`
+    
+    Some devices cannot be identified, e.g. events caused by software.
+    Then the devices stores an invalid handle and has `name=&#39;unknown&#39;`.
     &#34;&#34;&#34;
     handle: int
     &#34;&#34;&#34;Windows handle for the device. This is valid only in the current session. For a unique identifier, use `name`.&#34;&#34;&#34;
