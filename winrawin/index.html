@@ -124,22 +124,23 @@ This can be obtained from various libraries that open windows, such as</p>
                 else:
                     key_name, is_keypad = KEY_NAMES_LOWER[scan_code], False
                 evt_type = KEY_EVENT_TYPE[message]
-                event = RawInputEvent(evt_type, scan_code, key_name, &#39;keypad&#39; if is_keypad else &#39;keyboard&#39;, device, None, None, hwnd, event_time, None)
+                event = RawInputEvent(evt_type, scan_code, key_name, &#39;keypad&#39; if is_keypad else &#39;keyboard&#39;, device, None, None, hwnd, event_time, None, raw)
             elif raw.header.dwType == 0:  # Mouse
                 assert dwSize.value == 48
                 button = raw.data.mouse.ulButtons
                 if button == 0:
-                    event = RawInputEvent(&#39;move&#39;, -1, None, &#39;mouse&#39;, device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time, None)
+                    mode = raw.data.mouse.usFlags
+                    event = RawInputEvent(&#39;move&#39;, mode, MOVE_MODES.get(mode, &#39;unknown&#39;), &#39;mouse&#39;, device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time, None, raw)
                 else:
                     evt_type, button_id, button_name = MOUSE_BUTTONS[button]
-                    event = RawInputEvent(evt_type, button_id, button_name, &#39;mouse&#39;, device, None, None, hwnd, event_time, None)
+                    event = RawInputEvent(evt_type, button_id, button_name, &#39;mouse&#39;, device, None, None, hwnd, event_time, None, raw)
             elif raw.header.dwType == 2:  # Controller
                 size_hid = raw.data.hid.dwSizeHid  # The size, in bytes, of each HID input in bRawData.
                 count = raw.data.hid.dwCount  # The number of HID inputs in bRawData.
                 raw_data = raw.data.hid.bRawData  # The raw input data, as an array of bytes.
                 raw_data_ptr = ctypes.cast(raw_data, POINTER(BYTE * (size_hid * count)))
                 raw_data_bytes = ctypes.string_at(raw_data_ptr, sizeof(raw_data_ptr.contents))
-                event = RawInputEvent(&#39;data&#39;, -1, f&#39;{count} x {size_hid} bytes&#39;, &#39;hid&#39;, device, None, None, hwnd, event_time, raw_data_bytes)
+                event = RawInputEvent(&#39;data&#39;, -1, f&#39;{count} x {size_hid} bytes&#39;, &#39;hid&#39;, device, None, None, hwnd, event_time, raw_data_bytes, raw)
             else:
                 raise NotImplementedError
             callback(event)
@@ -480,7 +481,7 @@ If not, the device has most likely been disconnected.</p></div>
 </dd>
 <dt id="winrawin.RawInputEvent"><code class="flex name class">
 <span>class <span class="ident">RawInputEvent</span></span>
-<span>(</span><span>event_type: str, code: int, name: Optional[str], device_type: str, device: winrawin._api.RawInputDevice, delta_x: Optional[int], delta_y: Optional[int], hwnd: int, time: float, data: Optional[bytes])</span>
+<span>(</span><span>event_type: str, code: int, name: Optional[str], device_type: str, device: winrawin._api.RawInputDevice, delta_x: Optional[int], delta_y: Optional[int], hwnd: int, time: float, data: Optional[bytes], raw: winrawin._win_raw_input.RAWINPUT)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>These events are sent to the callback registered via <code><a title="winrawin.hook_raw_input_for_window" href="#winrawin.hook_raw_input_for_window">hook_raw_input_for_window()</a></code>.</p></div>
@@ -512,7 +513,9 @@ class RawInputEvent:
     time: float
     &#34;&#34;&#34;Time of the event measured vis `time.perf_counter()`&#34;&#34;&#34;
     data: Optional[bytes]
-    &#34;&#34;&#34;Raw data sent by HID devices&#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;Raw data sent by HID devices&#34;&#34;&#34;
+    raw: RAWINPUT
+    &#34;&#34;&#34;Raw event data sent from Windows&#34;&#34;&#34;</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -551,6 +554,10 @@ class RawInputEvent:
 <dt id="winrawin.RawInputEvent.name"><code class="name">var <span class="ident">name</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"><p>mouse button or key name</p></div>
+</dd>
+<dt id="winrawin.RawInputEvent.raw"><code class="name">var <span class="ident">raw</span> : winrawin._win_raw_input.RAWINPUT</code></dt>
+<dd>
+<div class="desc"><p>Raw event data sent from Windows</p></div>
 </dd>
 <dt id="winrawin.RawInputEvent.time"><code class="name">var <span class="ident">time</span> : float</code></dt>
 <dd>
@@ -627,6 +634,7 @@ class RawInputEvent:
 <li><code><a title="winrawin.RawInputEvent.event_type" href="#winrawin.RawInputEvent.event_type">event_type</a></code></li>
 <li><code><a title="winrawin.RawInputEvent.hwnd" href="#winrawin.RawInputEvent.hwnd">hwnd</a></code></li>
 <li><code><a title="winrawin.RawInputEvent.name" href="#winrawin.RawInputEvent.name">name</a></code></li>
+<li><code><a title="winrawin.RawInputEvent.raw" href="#winrawin.RawInputEvent.raw">raw</a></code></li>
 <li><code><a title="winrawin.RawInputEvent.time" href="#winrawin.RawInputEvent.time">time</a></code></li>
 </ul>
 </li>
