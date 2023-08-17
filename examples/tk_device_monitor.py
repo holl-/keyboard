@@ -44,7 +44,6 @@ def open_window():
     n_hid = 0
     for device in list_devices():
         label = create_copiable_label(table, text=device.name, bg=tk_rgb(0, 0, 0))
-        # label.pack()
         labels[device] = label
         if isinstance(device, Mouse):
             n_mice += 1

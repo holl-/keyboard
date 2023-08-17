@@ -185,6 +185,8 @@ class RawInputEvent:
     """Time of the event measured vis `time.perf_counter()`"""
     data: Optional[bytes]
     """Raw data sent by HID devices"""
+    raw: RAWINPUT
+    """Raw event data sent from Windows"""
 
 
 def hook_raw_input_for_window(hwnd,
@@ -230,22 +232,23 @@ def hook_raw_input_for_window(hwnd,
                 else:
                     key_name, is_keypad = KEY_NAMES_LOWER[scan_code], False
                 evt_type = KEY_EVENT_TYPE[message]
-                event = RawInputEvent(evt_type, scan_code, key_name, 'keypad' if is_keypad else 'keyboard', device, None, None, hwnd, event_time, None)
+                event = RawInputEvent(evt_type, scan_code, key_name, 'keypad' if is_keypad else 'keyboard', device, None, None, hwnd, event_time, None, raw)
             elif raw.header.dwType == 0:  # Mouse
                 assert dwSize.value == 48
                 button = raw.data.mouse.ulButtons
                 if button == 0:
-                    event = RawInputEvent('move', -1, None, 'mouse', device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time, None)
+                    mode = raw.data.mouse.usFlags
+                    event = RawInputEvent('move', mode, MOVE_MODES.get(mode, 'unknown'), 'mouse', device, raw.data.mouse.lLastX, raw.data.mouse.lLastY, hwnd, event_time, None, raw)
                 else:
                     evt_type, button_id, button_name = MOUSE_BUTTONS[button]
-                    event = RawInputEvent(evt_type, button_id, button_name, 'mouse', device, None, None, hwnd, event_time, None)
+                    event = RawInputEvent(evt_type, button_id, button_name, 'mouse', device, None, None, hwnd, event_time, None, raw)
             elif raw.header.dwType == 2:  # Controller
                 size_hid = raw.data.hid.dwSizeHid  # The size, in bytes, of each HID input in bRawData.
                 count = raw.data.hid.dwCount  # The number of HID inputs in bRawData.
                 raw_data = raw.data.hid.bRawData  # The raw input data, as an array of bytes.
                 raw_data_ptr = ctypes.cast(raw_data, POINTER(BYTE * (size_hid * count)))
                 raw_data_bytes = ctypes.string_at(raw_data_ptr, sizeof(raw_data_ptr.contents))
-                event = RawInputEvent('data', -1, f'{count} x {size_hid} bytes', 'hid', device, None, None, hwnd, event_time, raw_data_bytes)
+                event = RawInputEvent('data', -1, f'{count} x {size_hid} bytes', 'hid', device, None, None, hwnd, event_time, raw_data_bytes, raw)
             else:
                 raise NotImplementedError
             callback(event)

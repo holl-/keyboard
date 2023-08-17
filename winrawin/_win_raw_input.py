@@ -114,7 +114,7 @@ class RAWINPUTHEADER(Structure):
     ]
 
 
-class RAWMOUSE(Structure):
+class RAWMOUSE(Structure):  # https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-rawmouse
     class _U1(Union):
         class _S2(Structure):
             _fields_ = [
@@ -801,6 +801,14 @@ MOUSE_TYPES = {
     0x0080: 'HID mouse',
     0x0100: 'HID wheel mouse',
     0x8000: 'Mouse with horizontal wheel',
+}
+
+MOVE_MODES = {
+    0x00: 'relative',
+    0x01: 'absolute',
+    0x02: 'virtual desktop',
+    0x04: 'attributes changed',
+    0x08: 'no coalesce',
 }
 
 KEYBOARD_TYPES = {
