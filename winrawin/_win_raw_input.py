@@ -854,6 +854,8 @@ def get_device_name(device) -> str:
     Returns:
         `RIDI_DEVICENAME` as `str`.
     """
+    if device is None:
+        return 'unknown'
     device_handle = device.hDevice if isinstance(device, RAWINPUTDEVICELIST) else device
     name_size = ctypes.c_uint()  # Get the size of the device name buffer
     if GetRawInputDeviceInfoW(device_handle, RIDI_DEVICENAME, None, name_size):
@@ -891,6 +893,8 @@ def get_device_info(device):
     Returns:
         `RIDI_DEVICEINFO` struct
     """
+    if device is None:
+        return RID_DEVICE_INFO()
     device_handle = device.hDevice if isinstance(device, RAWINPUTDEVICELIST) else device
     info_size = ctypes.c_uint()
     if GetRawInputDeviceInfoW(device_handle, RIDI_DEVICEINFO, None, info_size):
