@@ -15,7 +15,7 @@ class RawInputDevice:
     * `Mouse`
     * `Keyboard`
     * `HID`
-    
+
     Some devices cannot be identified, e.g. events caused by software.
     Then the devices stores an invalid handle and has `name='unknown'`.
     """
@@ -194,7 +194,7 @@ class RawInputEvent:
 
 def hook_raw_input_for_window(hwnd,
                               callback: Callable[[RawInputEvent], None],
-                              device_types=('keyboard', 'mouse', 'controller')):
+                              device_types=('pointer', 'mouse', 'joystick', 'gamepad', 'keyboard', 'keypad', 'multi-axis controller')):
     """
     Listen to raw input events sent to a window by the operating system (Windows).
 
@@ -213,7 +213,10 @@ def hook_raw_input_for_window(hwnd,
             * `fig.canvas.manager.window.winId()` in matplotlib using PyQt5
 
         callback: Function
-        device_types: Types of devices to listen for. Supports 'keyboard' and 'mouse'.
+        device_types:
+           Types of devices to listen for.
+           This defines the usage page and value.
+           Supported device types are `'pointer'`, `'mouse'`, `'joystick'`, `'gamepad'`, `'keyboard'`, `'keypad'`, `'multi-axis controller'`.
     """
     def process_message(hwnd, msg, wParam, lParam):  # Called by Windows to handle window events.
         if msg == WM_INPUT:  # raw input. other events don't reference the device
@@ -225,6 +228,8 @@ def hook_raw_input_for_window(hwnd,
             assert user32.GetRawInputData(lParam, RID_INPUT, byref(raw), byref(dwSize), sizeof(RAWINPUTHEADER)) == dwSize.value
             device = get_device(raw.header.dwType, raw.header.hDevice)
             if raw.header.dwType == 1:  # Keyboard
+                if raw.data.mouse.usFlags in MOVE_MODES and raw.data.mouse._s2.usButtonFlags == 0:  # actually caused by mouse
+                    device = get_device(0, raw.header.hDevice)
                 assert dwSize.value == 40
                 message = raw.data.keyboard.message
                 vk_code = raw.data.keyboard.vk_code
@@ -255,7 +260,6 @@ def hook_raw_input_for_window(hwnd,
             else:
                 raise NotImplementedError
             callback(event)
-
     if hwnd:
         set_window_procedure(hwnd, process_message, call_original=True)
     else:

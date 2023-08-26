@@ -766,10 +766,14 @@ def invisible_window(procedure: Callable):
 
 
 def enable_raw_input_for_window(hwnd, device_type='keyboard'):
-    usage_page, usage = {  # https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
-        'keyboard': (1, 6),
-        'controller': (1, 4),
+    usage_page, usage = {  # https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-usages
+        'pointer': (1, 1),
         'mouse': (1, 2),
+        'joystick': (1, 4),
+        'gamepad': (1, 5),
+        'keyboard': (1, 6),
+        'keypad': (1, 7),
+        'multi-axis controller': (1, 8),
     }[device_type]
     raw_input_device = RAWINPUTDEVICE()
     raw_input_device.us_usage_page = usage_page
