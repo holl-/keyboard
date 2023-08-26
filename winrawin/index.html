@@ -110,7 +110,6 @@ Supported device types are <code>'pointer'</code>, <code>'mouse'</code>, <code>'
            Supported device types are `&#39;pointer&#39;`, `&#39;mouse&#39;`, `&#39;joystick&#39;`, `&#39;gamepad&#39;`, `&#39;keyboard&#39;`, `&#39;keypad&#39;`, `&#39;multi-axis controller&#39;`.
     &#34;&#34;&#34;
     def process_message(hwnd, msg, wParam, lParam):  # Called by Windows to handle window events.
-        print(msg)
         if msg == WM_INPUT:  # raw input. other events don&#39;t reference the device
             event_time = time.perf_counter()
             dwSize = c_uint()
