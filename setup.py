@@ -12,6 +12,8 @@ setup(
     author='Philipp Holl',
     author_email='philipp@mholl.de',
     packages=['winrawin'],
+    package_data={'': ['winrawin/usb.ids']},
+    include_package_data=True,
     url='https://github.com/holl-/win-raw-in',
     license='MIT',
     description='Enumerate raw input devices and receive input events with device ID on Windows',

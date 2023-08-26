@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from ._win_raw_input import *
+from .usb_ids import parse_vid_pid, lookup_product
 
 
 @dataclass
@@ -19,10 +20,19 @@ class RawInputDevice:
     Some devices cannot be identified, e.g. events caused by software.
     Then the devices stores an invalid handle and has `path=None`.
     """
+
     handle: int
     """Windows handle for the device. This is valid only in the current session. For a unique identifier, use `path`."""
     path: Optional[str]
     """Unique device identifier. This string typically includes vendor and product id."""
+    vendor_id: int
+    """USB vendor id"""
+    vendor_name: Optional[str]
+    """Vendor name or `None` if unknown."""
+    product_id: int
+    """USB product id"""
+    product_name: str
+    """Product name or `None` if unknown."""
 
     def is_connected(self):
         """
@@ -95,8 +105,6 @@ class HID(RawInputDevice):
 
     This class inherits the method `RawInputDevice.is_connected()`.
     """
-    vendor_id: int
-    product_id: int
     version_number: int
     usage_page: int
     usage_page_name: str
@@ -132,14 +140,16 @@ def list_devices() -> Sequence[RawInputDevice]:
 def get_device(dw_type: int, handle: int) -> RawInputDevice:
     if handle in CACHED_DEVICES:
         return CACHED_DEVICES[handle]
-    name = get_device_path(handle)
+    path = get_device_path(handle)
     info = get_device_info(handle)
     if dw_type == 0:
         mouse_type = MOUSE_TYPES.get(info.u.mouse.dwId, 'unknown')
         num_buttons = info.u.mouse.dwNumberOfButtons
         sample_rate = info.u.mouse.dwSampleRate or None
         has_horizontal_wheel = bool(info.u.mouse.fHasHorizontalWheel)
-        device = Mouse(handle, name, mouse_type, num_buttons, sample_rate, has_horizontal_wheel)
+        vendor_id, product_id = parse_vid_pid(path)
+        vendor_name, product_name = lookup_product(vendor_id, product_id)
+        device = Mouse(handle, path, vendor_id, vendor_name, product_id, product_name, mouse_type, num_buttons, sample_rate, has_horizontal_wheel)
     elif dw_type == 1:
         kb_type = KEYBOARD_TYPES.get(info.u.keyboard.dwType, 'unknown')
         subtype = info.u.keyboard.dwSubType
@@ -147,7 +157,9 @@ def get_device(dw_type: int, handle: int) -> RawInputDevice:
         num_function_keys = info.u.keyboard.dwNumberOfFunctionKeys
         num_indicators = info.u.keyboard.dwNumberOfIndicators
         num_keys = info.u.keyboard.dwNumberOfKeysTotal
-        device = Keyboard(handle, name, kb_type, subtype, scan_code_mode, num_function_keys, num_indicators, num_keys)
+        vendor_id, product_id = parse_vid_pid(path)
+        vendor_name, product_name = lookup_product(vendor_id, product_id)
+        device = Keyboard(handle, path, vendor_id, vendor_name, product_id, product_name, kb_type, subtype, scan_code_mode, num_function_keys, num_indicators, num_keys)
     elif dw_type == 2:
         vendor_id = info.u.hid.dwVendorId
         product_id = info.u.hid.dwProductId
@@ -156,7 +168,8 @@ def get_device(dw_type: int, handle: int) -> RawInputDevice:
         usage_page_name, page_entries = USAGE_PAGE_NAMES.get(usage_page, ('unknown', {}))
         usage = info.u.hid.usUsage
         usage_name = page_entries.get(usage, 'unknown')
-        device = HID(handle, name, vendor_id, product_id, version_number, usage_page, usage_page_name, usage, usage_name)
+        vendor_name, product_name = lookup_product(vendor_id, product_id)
+        device = HID(handle, path, vendor_id, vendor_name, product_id, product_name, version_number, usage_page, usage_page_name, usage, usage_name)
     else:
         raise NotImplementedError(f"Unknown device type: {dw_type}")
     CACHED_DEVICES[handle] = device
