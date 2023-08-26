@@ -52,7 +52,7 @@ __all__ = [key for key in globals().keys() if not key.startswith(&#39;_&#39;)]</
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="winrawin.hook_raw_input_for_window"><code class="name flex">
-<span>def <span class="ident">hook_raw_input_for_window</span></span>(<span>hwnd, callback: Callable[[winrawin._api.RawInputEvent], None], device_types=('keyboard', 'mouse', 'controller'))</span>
+<span>def <span class="ident">hook_raw_input_for_window</span></span>(<span>hwnd, callback: Callable[[winrawin._api.RawInputEvent], None], device_types=('pointer', 'mouse', 'joystick', 'gamepad', 'keyboard', 'keypad', 'multi-axis controller'))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Listen to raw input events sent to a window by the operating system (Windows).</p>
@@ -74,16 +74,18 @@ This can be obtained from various libraries that open windows, such as</p>
 </dd>
 <dt><strong><code>callback</code></strong></dt>
 <dd>Function</dd>
-<dt><strong><code>device_types</code></strong></dt>
-<dd>Types of devices to listen for. Supports 'keyboard' and 'mouse'.</dd>
-</dl></div>
+</dl>
+<p>device_types:
+Types of devices to listen for.
+This defines the usage page and value.
+Supported device types are <code>'pointer'</code>, <code>'mouse'</code>, <code>'joystick'</code>, <code>'gamepad'</code>, <code>'keyboard'</code>, <code>'keypad'</code>, <code>'multi-axis controller'</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def hook_raw_input_for_window(hwnd,
                               callback: Callable[[RawInputEvent], None],
-                              device_types=(&#39;keyboard&#39;, &#39;mouse&#39;, &#39;controller&#39;)):
+                              device_types=(&#39;pointer&#39;, &#39;mouse&#39;, &#39;joystick&#39;, &#39;gamepad&#39;, &#39;keyboard&#39;, &#39;keypad&#39;, &#39;multi-axis controller&#39;)):
     &#34;&#34;&#34;
     Listen to raw input events sent to a window by the operating system (Windows).
 
@@ -102,9 +104,13 @@ This can be obtained from various libraries that open windows, such as</p>
             * `fig.canvas.manager.window.winId()` in matplotlib using PyQt5
 
         callback: Function
-        device_types: Types of devices to listen for. Supports &#39;keyboard&#39; and &#39;mouse&#39;.
+        device_types:
+           Types of devices to listen for.
+           This defines the usage page and value.
+           Supported device types are `&#39;pointer&#39;`, `&#39;mouse&#39;`, `&#39;joystick&#39;`, `&#39;gamepad&#39;`, `&#39;keyboard&#39;`, `&#39;keypad&#39;`, `&#39;multi-axis controller&#39;`.
     &#34;&#34;&#34;
     def process_message(hwnd, msg, wParam, lParam):  # Called by Windows to handle window events.
+        print(msg)
         if msg == WM_INPUT:  # raw input. other events don&#39;t reference the device
             event_time = time.perf_counter()
             dwSize = c_uint()
@@ -114,6 +120,8 @@ This can be obtained from various libraries that open windows, such as</p>
             assert user32.GetRawInputData(lParam, RID_INPUT, byref(raw), byref(dwSize), sizeof(RAWINPUTHEADER)) == dwSize.value
             device = get_device(raw.header.dwType, raw.header.hDevice)
             if raw.header.dwType == 1:  # Keyboard
+                if raw.data.mouse.usFlags in MOVE_MODES and raw.data.mouse._s2.usButtonFlags == 0:  # actually caused by mouse
+                    device = get_device(0, raw.header.hDevice)
                 assert dwSize.value == 40
                 message = raw.data.keyboard.message
                 vk_code = raw.data.keyboard.vk_code
@@ -144,7 +152,6 @@ This can be obtained from various libraries that open windows, such as</p>
             else:
                 raise NotImplementedError
             callback(event)
-
     if hwnd:
         set_window_procedure(hwnd, process_message, call_original=True)
     else:
@@ -429,7 +436,7 @@ class RawInputDevice:
     * `Mouse`
     * `Keyboard`
     * `HID`
-    
+
     Some devices cannot be identified, e.g. events caused by software.
     Then the devices stores an invalid handle and has `name=&#39;unknown&#39;`.
     &#34;&#34;&#34;
