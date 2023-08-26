@@ -59,7 +59,7 @@ __all__ = [key for key in globals().keys() if not key.startswith(&#39;_&#39;)]</
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="winrawin.hook_raw_input_for_window"><code class="name flex">
-<span>def <span class="ident">hook_raw_input_for_window</span></span>(<span>hwnd, callback: Callable[[winrawin._api.RawInputEvent], None], device_types=('pointer', 'mouse', 'joystick', 'gamepad', 'keyboard', 'keypad', 'multi-axis controller'))</span>
+<span>def <span class="ident">hook_raw_input_for_window</span></span>(<span>hwnd, callback: Callable[[winrawin._api.RawInputEvent], None], device_types=('Pointer', 'Mouse', 'Joystick', 'Game Pad', 'Keyboard', 'Keypad', 'Multi-axis Controller'))</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Listen to raw input events sent to a window by the operating system (Windows).</p>
@@ -85,14 +85,14 @@ This can be obtained from various libraries that open windows, such as</p>
 <p>device_types:
 Types of devices to listen for.
 This defines the usage page and value.
-Supported device types are <code>'pointer'</code>, <code>'mouse'</code>, <code>'joystick'</code>, <code>'gamepad'</code>, <code>'keyboard'</code>, <code>'keypad'</code>, <code>'multi-axis controller'</code>.</p></div>
+Supported device types are <code>'Pointer'</code>, <code>'Mouse'</code>, <code>'Joystick'</code>, <code>'Game Pad'</code>, <code>'Keyboard'</code>, <code>'Keypad'</code>, <code>'Multi-axis Controller'</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def hook_raw_input_for_window(hwnd,
                               callback: Callable[[RawInputEvent], None],
-                              device_types=(&#39;pointer&#39;, &#39;mouse&#39;, &#39;joystick&#39;, &#39;gamepad&#39;, &#39;keyboard&#39;, &#39;keypad&#39;, &#39;multi-axis controller&#39;)):
+                              device_types=(&#39;Pointer&#39;, &#39;Mouse&#39;, &#39;Joystick&#39;, &#39;Game Pad&#39;, &#39;Keyboard&#39;, &#39;Keypad&#39;, &#39;Multi-axis Controller&#39;)):
     &#34;&#34;&#34;
     Listen to raw input events sent to a window by the operating system (Windows).
 
@@ -114,7 +114,7 @@ Supported device types are <code>'pointer'</code>, <code>'mouse'</code>, <code>'
         device_types:
            Types of devices to listen for.
            This defines the usage page and value.
-           Supported device types are `&#39;pointer&#39;`, `&#39;mouse&#39;`, `&#39;joystick&#39;`, `&#39;gamepad&#39;`, `&#39;keyboard&#39;`, `&#39;keypad&#39;`, `&#39;multi-axis controller&#39;`.
+           Supported device types are `&#39;Pointer&#39;`, `&#39;Mouse&#39;`, `&#39;Joystick&#39;`, `&#39;Game Pad&#39;`, `&#39;Keyboard&#39;`, `&#39;Keypad&#39;`, `&#39;Multi-axis Controller&#39;`.
     &#34;&#34;&#34;
     def process_message(hwnd, msg, wParam, lParam):  # Called by Windows to handle window events.
         if msg == WM_INPUT:  # raw input. other events don&#39;t reference the device
