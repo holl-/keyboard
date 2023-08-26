@@ -207,7 +207,7 @@ class RawInputEvent:
 
 def hook_raw_input_for_window(hwnd,
                               callback: Callable[[RawInputEvent], None],
-                              device_types=('pointer', 'mouse', 'joystick', 'gamepad', 'keyboard', 'keypad', 'multi-axis controller')):
+                              device_types=('Pointer', 'Mouse', 'Joystick', 'Game Pad', 'Keyboard', 'Keypad', 'Multi-axis Controller')):
     """
     Listen to raw input events sent to a window by the operating system (Windows).
 
@@ -229,7 +229,7 @@ def hook_raw_input_for_window(hwnd,
         device_types:
            Types of devices to listen for.
            This defines the usage page and value.
-           Supported device types are `'pointer'`, `'mouse'`, `'joystick'`, `'gamepad'`, `'keyboard'`, `'keypad'`, `'multi-axis controller'`.
+           Supported device types are `'Pointer'`, `'Mouse'`, `'Joystick'`, `'Game Pad'`, `'Keyboard'`, `'Keypad'`, `'Multi-axis Controller'`.
     """
     def process_message(hwnd, msg, wParam, lParam):  # Called by Windows to handle window events.
         if msg == WM_INPUT:  # raw input. other events don't reference the device

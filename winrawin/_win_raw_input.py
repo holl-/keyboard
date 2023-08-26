@@ -765,16 +765,8 @@ def invisible_window(procedure: Callable):
     return h_window
 
 
-def enable_raw_input_for_window(hwnd, device_type='keyboard'):
-    usage_page, usage = {  # https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-usages
-        'pointer': (1, 1),
-        'mouse': (1, 2),
-        'joystick': (1, 4),
-        'gamepad': (1, 5),
-        'keyboard': (1, 6),
-        'keypad': (1, 7),
-        'multi-axis controller': (1, 8),
-    }[device_type]
+def enable_raw_input_for_window(hwnd: int, device_type='Keyboard'):
+    usage_page, usage = USAGE_NAME_TO_VALUE[device_type.lower()]
     raw_input_device = RAWINPUTDEVICE()
     raw_input_device.us_usage_page = usage_page
     raw_input_device.us_usage = usage
@@ -831,6 +823,7 @@ GENERIC_DESKTOP_CONTROLS_PAGE = {
     0x07:	"Keypad",
     0x08:	"Multi-axis Controller"
 }
+USAGE_NAME_TO_VALUE = {v.lower(): (1, k) for k, v in GENERIC_DESKTOP_CONTROLS_PAGE.items()}
 
 USAGE_PAGE_NAMES = {
     0x01: ("Generic Desktop Controls", GENERIC_DESKTOP_CONTROLS_PAGE),
