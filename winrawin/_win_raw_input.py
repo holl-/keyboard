@@ -6,7 +6,7 @@ But it is also dependency-free, very performant well documented on Microsoft's w
 import ctypes
 from ctypes import c_short, c_uint8, c_int, c_uint, c_long, Structure, CFUNCTYPE, POINTER, WINFUNCTYPE, byref, sizeof, Union, c_ushort
 from ctypes.wintypes import WORD, DWORD, BOOL, HHOOK, MSG, LPWSTR, WCHAR, WPARAM, LPARAM, LONG, USHORT, HWND, UINT, HANDLE, LPCWSTR, ULONG, BYTE, HMENU, HINSTANCE, LPVOID, INT
-from typing import Callable
+from typing import Callable, Optional
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
@@ -850,16 +850,16 @@ def get_raw_input_device_list() -> ctypes.Array:
     return devices
 
 
-def get_device_name(device) -> str:
+def get_device_path(device) -> Optional[str]:
     """
     Args:
         device: RAWINPUTDEVICELIST or hDevice
 
     Returns:
-        `RIDI_DEVICENAME` as `str`.
+        `RIDI_DEVICENAME` as `str`. This string typically includes vendor and product id.
     """
     if device is None:
-        return 'unknown'
+        return None
     device_handle = device.hDevice if isinstance(device, RAWINPUTDEVICELIST) else device
     name_size = ctypes.c_uint()  # Get the size of the device name buffer
     if GetRawInputDeviceInfoW(device_handle, RIDI_DEVICENAME, None, name_size):

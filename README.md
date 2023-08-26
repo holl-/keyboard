@@ -37,9 +37,9 @@ import winrawin
 
 for device in winrawin.list_devices():
     if isinstance(device, winrawin.Mouse):
-        print(f"{device.mouse_type} name='{device.name}'")
+        print(f"{device.mouse_type} name='{device.path}'")
     if isinstance(device, winrawin.Keyboard):
-        print(f"{device.keyboard_type} with {device.num_keys} keys name='{device.name}'")
+        print(f"{device.keyboard_type} with {device.num_keys} keys name='{device.path}'")
 ```
 
 ### Listen to input events

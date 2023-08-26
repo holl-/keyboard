@@ -17,12 +17,12 @@ class RawInputDevice:
     * `HID`
 
     Some devices cannot be identified, e.g. events caused by software.
-    Then the devices stores an invalid handle and has `name='unknown'`.
+    Then the devices stores an invalid handle and has `path=None`.
     """
     handle: int
-    """Windows handle for the device. This is valid only in the current session. For a unique identifier, use `name`."""
-    name: str
-    """Unique device identifier."""
+    """Windows handle for the device. This is valid only in the current session. For a unique identifier, use `path`."""
+    path: Optional[str]
+    """Unique device identifier. This string typically includes vendor and product id."""
 
     def is_connected(self):
         """
@@ -132,7 +132,7 @@ def list_devices() -> Sequence[RawInputDevice]:
 def get_device(dw_type: int, handle: int) -> RawInputDevice:
     if handle in CACHED_DEVICES:
         return CACHED_DEVICES[handle]
-    name = get_device_name(handle)
+    name = get_device_path(handle)
     info = get_device_info(handle)
     if dw_type == 0:
         mouse_type = MOUSE_TYPES.get(info.u.mouse.dwId, 'unknown')
