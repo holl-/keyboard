@@ -61,6 +61,8 @@ def parse_vid_pid(device_id: str):
         return 0, 0
     vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
     product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
+    # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
     return int(vendor_id, 16), int(product_id, 16)
 
 
@@ -120,6 +122,8 @@ if __name__ == &#39;__main__&#39;:
         return 0, 0
     vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
     product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
+    # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
     return int(vendor_id, 16), int(product_id, 16)</code></pre>
 </details>
 </dd>
