@@ -295,6 +295,9 @@ GetRawInputDeviceInfoW.restype = ctypes.c_uint
 CallWindowProc = user32.CallWindowProcA
 CallWindowProc.argtypes = [HANDLE, HWND, UINT, WPARAM, LPARAM]
 
+DefWindowProcA = user32.DefWindowProcA
+DefWindowProcA.argtypes = [HWND, UINT, WPARAM, LPARAM]
+
 NULL = c_int(0)
 
 WM_INPUT = 0x00FF
@@ -721,7 +724,7 @@ def set_window_procedure(hwnd, procedure: Callable, call_original=False):
         if call_original:
             return CallWindowProc(prevWndProc, hwnd, msg, wParam, lParam)
         else:
-            return user32.DefWindowProcA(c_int(hwnd), c_int(msg), c_int(wParam), c_int(lParam))
+            return DefWindowProcA(hwnd, msg, wParam, lParam)
 
     GWL_WNDPROC = ctypes.c_int(-4)
     new_window_procedure = WNDPROCTYPE(process_message)

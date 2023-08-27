@@ -8,11 +8,11 @@ Homepage: https://github.com/holl-/win-raw-in
 
 setup(
     name='win-raw-in',
-    version='0.2.0',
+    version='0.2.1',
     author='Philipp Holl',
     author_email='philipp@mholl.de',
     packages=['winrawin'],
-    package_data={'': ['winrawin/usb.ids']},
+    package_data={'': ['usb.ids']},
     include_package_data=True,
     url='https://github.com/holl-/win-raw-in',
     license='MIT',

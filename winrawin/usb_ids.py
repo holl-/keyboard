@@ -8,6 +8,8 @@ with open(os.path.join(os.path.dirname(__file__), 'usb.ids'), 'r') as usb_ids_fi
 
 
 def lookup_product(vendor_id: int, product_id: int) -> Tuple[Optional[str], Optional[str]]:
+    if vendor_id is None:
+        return None, None
     vendor_id = f'{vendor_id:#06x}'[2:]
     product_id = f'{product_id:#06x}'[2:]
     try:
@@ -31,9 +33,21 @@ def lookup_product(vendor_id: int, product_id: int) -> Tuple[Optional[str], Opti
 def parse_vid_pid(device_id: str):
     if device_id is None:
         return 0, 0
-    vendor_id = re.search(r'VID_(.*?)[&#]', device_id).group(1)
-    product_id = re.search(r'PID_(.*?)[&#]', device_id).group(1)
-    return int(vendor_id, 16), int(product_id, 16)
+    if 'VID_' in device_id:
+        vendor_id = re.search(r'VID_(.*?)[&#]', device_id).group(1)
+    elif 'VID&' in device_id:
+        vendor_id = re.search(r'VID&(.*?)_', device_id).group(1)
+    else:
+        vendor_id = None
+    if 'PID_' in device_id:
+        product_id = re.search(r'PID_(.*?)[&#]', device_id).group(1)
+    elif 'PID&' in device_id:
+        product_id = re.search(r'PID&(.*?)_', device_id).group(1)
+    else:
+        product_id = None
+    # interface_id = re.search(r'MI_(.*?)[&#]', device_id).group(1)
+    # collection_id = re.search(r'Col_(.*?)[&#]', device_id).group(1)
+    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)
 
 
 if __name__ == '__main__':
