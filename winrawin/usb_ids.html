@@ -36,6 +36,8 @@ with open(os.path.join(os.path.dirname(__file__), &#39;usb.ids&#39;), &#39;r&#39
 
 
 def lookup_product(vendor_id: int, product_id: int) -&gt; Tuple[Optional[str], Optional[str]]:
+    if vendor_id is None:
+        return None, None
     vendor_id = f&#39;{vendor_id:#06x}&#39;[2:]
     product_id = f&#39;{product_id:#06x}&#39;[2:]
     try:
@@ -59,11 +61,21 @@ def lookup_product(vendor_id: int, product_id: int) -&gt; Tuple[Optional[str], O
 def parse_vid_pid(device_id: str):
     if device_id is None:
         return 0, 0
-    vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    if &#39;VID_&#39; in device_id:
+        vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    elif &#39;VID&amp;&#39; in device_id:
+        vendor_id = re.search(r&#39;VID&amp;(.*?)_&#39;, device_id).group(1)
+    else:
+        vendor_id = None
+    if &#39;PID_&#39; in device_id:
+        product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    elif &#39;PID&amp;&#39; in device_id:
+        product_id = re.search(r&#39;PID&amp;(.*?)_&#39;, device_id).group(1)
+    else:
+        product_id = None
     # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
     # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
-    return int(vendor_id, 16), int(product_id, 16)
+    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)
 
 
 if __name__ == &#39;__main__&#39;:
@@ -88,6 +100,8 @@ if __name__ == &#39;__main__&#39;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def lookup_product(vendor_id: int, product_id: int) -&gt; Tuple[Optional[str], Optional[str]]:
+    if vendor_id is None:
+        return None, None
     vendor_id = f&#39;{vendor_id:#06x}&#39;[2:]
     product_id = f&#39;{product_id:#06x}&#39;[2:]
     try:
@@ -120,11 +134,21 @@ if __name__ == &#39;__main__&#39;:
 <pre><code class="python">def parse_vid_pid(device_id: str):
     if device_id is None:
         return 0, 0
-    vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    if &#39;VID_&#39; in device_id:
+        vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    elif &#39;VID&amp;&#39; in device_id:
+        vendor_id = re.search(r&#39;VID&amp;(.*?)_&#39;, device_id).group(1)
+    else:
+        vendor_id = None
+    if &#39;PID_&#39; in device_id:
+        product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
+    elif &#39;PID&amp;&#39; in device_id:
+        product_id = re.search(r&#39;PID&amp;(.*?)_&#39;, device_id).group(1)
+    else:
+        product_id = None
     # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
     # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
-    return int(vendor_id, 16), int(product_id, 16)</code></pre>
+    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)</code></pre>
 </details>
 </dd>
 </dl>
