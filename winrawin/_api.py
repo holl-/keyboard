@@ -4,7 +4,7 @@ from typing import Sequence
 
 from ._device_id import parse_device_id
 from ._win_raw_input import *
-from .usb_ids import lookup_product
+from ._usb_ids import lookup_product
 
 
 @dataclass

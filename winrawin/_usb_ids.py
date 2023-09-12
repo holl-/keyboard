@@ -8,6 +8,17 @@ with open(os.path.join(os.path.dirname(__file__), 'usb.ids'), 'r') as usb_ids_fi
 
 
 def lookup_product(vendor_id: int, product_id: int) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Look up a vendor and product name by their USB ids.
+
+    Args:
+        vendor_id: Vendor ID according to the USB ID database.
+        product_id: Product ID according to the USB ID database.
+
+    Returns:
+        vendor_name: Human-readable vendor name as `str`.
+        product_name: Human-readable product name as `str`.
+    """
     if vendor_id is None:
         return None, None
     vendor_id = f'{vendor_id:#06x}'[2:]
