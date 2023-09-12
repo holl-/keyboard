@@ -43,7 +43,7 @@ def open_window():
     n_keyboards = 0
     n_hid = 0
     for device in list_devices():
-        label = create_copiable_label(table, text=(device.product_name or device.vendor_name or device.path), copy_str=device.path.replace('\\', '\\\\') if device.path else '', bg=tk_rgb(0, 0, 0))
+        label = create_copiable_label(table, text=(device.product_name or device.vendor_name or device.interface_name or device.path), copy_str=device.path.replace('\\', '\\\\') if device.path else '', bg=tk_rgb(0, 0, 0))
         labels[device] = label
         if isinstance(device, Mouse):
             n_mice += 1

@@ -30,26 +30,5 @@ def lookup_product(vendor_id: int, product_id: int) -> Tuple[Optional[str], Opti
     # ToDo if not in database, download new database http://www.linux-usb.org/usb.ids
 
 
-def parse_vid_pid(device_id: str):
-    if device_id is None:
-        return 0, 0
-    if 'VID_' in device_id:
-        vendor_id = re.search(r'VID_(.*?)[&#]', device_id).group(1)
-    elif 'VID&' in device_id:
-        vendor_id = re.search(r'VID&(.*?)_', device_id).group(1)
-    else:
-        vendor_id = None
-    if 'PID_' in device_id:
-        product_id = re.search(r'PID_(.*?)[&#]', device_id).group(1)
-    elif 'PID&' in device_id:
-        product_id = re.search(r'PID&(.*?)_', device_id).group(1)
-    else:
-        product_id = None
-    # interface_id = re.search(r'MI_(.*?)[&#]', device_id).group(1)
-    # collection_id = re.search(r'Col_(.*?)[&#]', device_id).group(1)
-    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)
-
-
-if __name__ == '__main__':
-    vid, pid = parse_vid_pid('\\\\?\\HID#{00001812-0000-1000-8000-00805f9b34fb}&Dev&VID_045e&PID_0b13&REV_0509&0c352633ee04&IG_00#a&3724ae32&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}')
-    print(lookup_product(vendor_id=vid, product_id=pid))
+# if __name__ == '__main__':
+#     print(lookup_product(vendor_id=vid, product_id=pid))
