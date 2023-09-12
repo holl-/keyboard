@@ -58,29 +58,8 @@ def lookup_product(vendor_id: int, product_id: int) -&gt; Tuple[Optional[str], O
     # ToDo if not in database, download new database http://www.linux-usb.org/usb.ids
 
 
-def parse_vid_pid(device_id: str):
-    if device_id is None:
-        return 0, 0
-    if &#39;VID_&#39; in device_id:
-        vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    elif &#39;VID&amp;&#39; in device_id:
-        vendor_id = re.search(r&#39;VID&amp;(.*?)_&#39;, device_id).group(1)
-    else:
-        vendor_id = None
-    if &#39;PID_&#39; in device_id:
-        product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    elif &#39;PID&amp;&#39; in device_id:
-        product_id = re.search(r&#39;PID&amp;(.*?)_&#39;, device_id).group(1)
-    else:
-        product_id = None
-    # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
-    # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
-    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)
-
-
-if __name__ == &#39;__main__&#39;:
-    vid, pid = parse_vid_pid(&#39;\\\\?\\HID#{00001812-0000-1000-8000-00805f9b34fb}&amp;Dev&amp;VID_045e&amp;PID_0b13&amp;REV_0509&amp;0c352633ee04&amp;IG_00#a&amp;3724ae32&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}&#39;)
-    print(lookup_product(vendor_id=vid, product_id=pid))</code></pre>
+# if __name__ == &#39;__main__&#39;:
+#     print(lookup_product(vendor_id=vid, product_id=pid))</code></pre>
 </details>
 </section>
 <section>
@@ -122,35 +101,6 @@ if __name__ == &#39;__main__&#39;:
     # ToDo if not in database, download new database http://www.linux-usb.org/usb.ids</code></pre>
 </details>
 </dd>
-<dt id="winrawin.usb_ids.parse_vid_pid"><code class="name flex">
-<span>def <span class="ident">parse_vid_pid</span></span>(<span>device_id: str)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_vid_pid(device_id: str):
-    if device_id is None:
-        return 0, 0
-    if &#39;VID_&#39; in device_id:
-        vendor_id = re.search(r&#39;VID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    elif &#39;VID&amp;&#39; in device_id:
-        vendor_id = re.search(r&#39;VID&amp;(.*?)_&#39;, device_id).group(1)
-    else:
-        vendor_id = None
-    if &#39;PID_&#39; in device_id:
-        product_id = re.search(r&#39;PID_(.*?)[&amp;#]&#39;, device_id).group(1)
-    elif &#39;PID&amp;&#39; in device_id:
-        product_id = re.search(r&#39;PID&amp;(.*?)_&#39;, device_id).group(1)
-    else:
-        product_id = None
-    # interface_id = re.search(r&#39;MI_(.*?)[&amp;#]&#39;, device_id).group(1)
-    # collection_id = re.search(r&#39;Col_(.*?)[&amp;#]&#39;, device_id).group(1)
-    return (int(vendor_id, 16) if vendor_id is not None else None), (int(product_id, 16) if product_id is not None else None)</code></pre>
-</details>
-</dd>
 </dl>
 </section>
 <section>
@@ -170,7 +120,6 @@ if __name__ == &#39;__main__&#39;:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="winrawin.usb_ids.lookup_product" href="#winrawin.usb_ids.lookup_product">lookup_product</a></code></li>
-<li><code><a title="winrawin.usb_ids.parse_vid_pid" href="#winrawin.usb_ids.parse_vid_pid">parse_vid_pid</a></code></li>
 </ul>
 </li>
 </ul>

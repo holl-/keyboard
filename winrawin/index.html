@@ -202,7 +202,7 @@ For each device, this function also looks up its unique name and additional info
 <dl>
 <dt id="winrawin.HID"><code class="flex name class">
 <span>class <span class="ident">HID</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: str, version_number: int, usage_page: int, usage_page_name: str, usage: int, usage_name: str)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], version_number: int, usage_page: int, usage_page_name: str, usage: int, usage_name: str)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>HID devices that are neither classified as keyboard nor mouse.
@@ -264,7 +264,7 @@ class HID(RawInputDevice):
 </dd>
 <dt id="winrawin.Keyboard"><code class="flex name class">
 <span>class <span class="ident">Keyboard</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: str, keyboard_type: str, subtype: int, scan_code_mode: int, num_function_keys: int, num_indicators: int, num_keys: int)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], keyboard_type: str, subtype: int, scan_code_mode: int, num_function_keys: int, num_indicators: int, num_keys: int)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keyboards send events when a key is pressed, released or while a key is being held.
@@ -333,7 +333,7 @@ class Keyboard(RawInputDevice):
 </dd>
 <dt id="winrawin.Mouse"><code class="flex name class">
 <span>class <span class="ident">Mouse</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: str, mouse_type: str, num_buttons: int, sample_rate: Optional[int], has_horizontal_wheel: bool)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], mouse_type: str, num_buttons: int, sample_rate: Optional[int], has_horizontal_wheel: bool)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Mice can send the following event types:</p>
@@ -406,7 +406,7 @@ class Mouse(RawInputDevice):
 </dd>
 <dt id="winrawin.RawInputDevice"><code class="flex name class">
 <span>class <span class="ident">RawInputDevice</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: str)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for input devices.</p>
@@ -447,8 +447,10 @@ class RawInputDevice:
     &#34;&#34;&#34;Vendor name or `None` if unknown.&#34;&#34;&#34;
     product_id: int
     &#34;&#34;&#34;USB product id&#34;&#34;&#34;
-    product_name: str
+    product_name: Optional[str]
     &#34;&#34;&#34;Product name or `None` if unknown.&#34;&#34;&#34;
+    interface_name: Optional[str]
+    &#34;&#34;&#34;Human-readable interface name obtained from the GUID of the device id.&#34;&#34;&#34;
 
     def is_connected(self):
         &#34;&#34;&#34;
@@ -469,6 +471,10 @@ class RawInputDevice:
 <dd>
 <div class="desc"><p>Windows handle for the device. This is valid only in the current session. For a unique identifier, use <code>path</code>.</p></div>
 </dd>
+<dt id="winrawin.RawInputDevice.interface_name"><code class="name">var <span class="ident">interface_name</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"><p>Human-readable interface name obtained from the GUID of the device id.</p></div>
+</dd>
 <dt id="winrawin.RawInputDevice.path"><code class="name">var <span class="ident">path</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"><p>Unique device identifier. This string typically includes vendor and product id.</p></div>
@@ -477,7 +483,7 @@ class RawInputDevice:
 <dd>
 <div class="desc"><p>USB product id</p></div>
 </dd>
-<dt id="winrawin.RawInputDevice.product_name"><code class="name">var <span class="ident">product_name</span> : str</code></dt>
+<dt id="winrawin.RawInputDevice.product_name"><code class="name">var <span class="ident">product_name</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"><p>Product name or <code>None</code> if unknown.</p></div>
 </dd>
@@ -654,6 +660,7 @@ class RawInputEvent:
 <h4><code><a title="winrawin.RawInputDevice" href="#winrawin.RawInputDevice">RawInputDevice</a></code></h4>
 <ul class="two-column">
 <li><code><a title="winrawin.RawInputDevice.handle" href="#winrawin.RawInputDevice.handle">handle</a></code></li>
+<li><code><a title="winrawin.RawInputDevice.interface_name" href="#winrawin.RawInputDevice.interface_name">interface_name</a></code></li>
 <li><code><a title="winrawin.RawInputDevice.is_connected" href="#winrawin.RawInputDevice.is_connected">is_connected</a></code></li>
 <li><code><a title="winrawin.RawInputDevice.path" href="#winrawin.RawInputDevice.path">path</a></code></li>
 <li><code><a title="winrawin.RawInputDevice.product_id" href="#winrawin.RawInputDevice.product_id">product_id</a></code></li>
