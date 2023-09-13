@@ -195,7 +195,7 @@ For each device, this function also looks up its unique name and additional info
 <dl>
 <dt id="winrawin.HID"><code class="flex name class">
 <span>class <span class="ident">HID</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], version_number: int, usage_page: int, usage_page_name: str, usage: int, usage_name: str)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: Optional[int], vendor_name: Optional[str], product_id: Optional[int], product_name: Optional[str], interface_name: Optional[str], version_number: int, usage_page: int, usage_page_name: str, usage: int, usage_name: str)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>HID devices that are neither classified as keyboard nor mouse.
@@ -257,7 +257,7 @@ class HID(RawInputDevice):
 </dd>
 <dt id="winrawin.Keyboard"><code class="flex name class">
 <span>class <span class="ident">Keyboard</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], keyboard_type: str, subtype: int, scan_code_mode: int, num_function_keys: int, num_indicators: int, num_keys: int)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: Optional[int], vendor_name: Optional[str], product_id: Optional[int], product_name: Optional[str], interface_name: Optional[str], keyboard_type: str, subtype: int, scan_code_mode: int, num_function_keys: int, num_indicators: int, num_keys: int)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keyboards send events when a key is pressed, released or while a key is being held.
@@ -326,7 +326,7 @@ class Keyboard(RawInputDevice):
 </dd>
 <dt id="winrawin.Mouse"><code class="flex name class">
 <span>class <span class="ident">Mouse</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str], mouse_type: str, num_buttons: int, sample_rate: Optional[int], has_horizontal_wheel: bool)</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: Optional[int], vendor_name: Optional[str], product_id: Optional[int], product_name: Optional[str], interface_name: Optional[str], mouse_type: str, num_buttons: int, sample_rate: Optional[int], has_horizontal_wheel: bool)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Mice can send the following event types:</p>
@@ -399,7 +399,7 @@ class Mouse(RawInputDevice):
 </dd>
 <dt id="winrawin.RawInputDevice"><code class="flex name class">
 <span>class <span class="ident">RawInputDevice</span></span>
-<span>(</span><span>handle: int, path: Optional[str], vendor_id: int, vendor_name: Optional[str], product_id: int, product_name: Optional[str], interface_name: Optional[str])</span>
+<span>(</span><span>handle: int, path: Optional[str], vendor_id: Optional[int], vendor_name: Optional[str], product_id: Optional[int], product_name: Optional[str], interface_name: Optional[str])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for input devices.</p>
@@ -434,11 +434,11 @@ class RawInputDevice:
     &#34;&#34;&#34;Windows handle for the device. This is valid only in the current session. For a unique identifier, use `path`.&#34;&#34;&#34;
     path: Optional[str]
     &#34;&#34;&#34;Unique device identifier. This string typically includes vendor and product id.&#34;&#34;&#34;
-    vendor_id: int
+    vendor_id: Optional[int]
     &#34;&#34;&#34;USB vendor id&#34;&#34;&#34;
     vendor_name: Optional[str]
     &#34;&#34;&#34;Vendor name or `None` if unknown.&#34;&#34;&#34;
-    product_id: int
+    product_id: Optional[int]
     &#34;&#34;&#34;USB product id&#34;&#34;&#34;
     product_name: Optional[str]
     &#34;&#34;&#34;Product name or `None` if unknown.&#34;&#34;&#34;
@@ -472,7 +472,7 @@ class RawInputDevice:
 <dd>
 <div class="desc"><p>Unique device identifier. This string typically includes vendor and product id.</p></div>
 </dd>
-<dt id="winrawin.RawInputDevice.product_id"><code class="name">var <span class="ident">product_id</span> : int</code></dt>
+<dt id="winrawin.RawInputDevice.product_id"><code class="name">var <span class="ident">product_id</span> : Optional[int]</code></dt>
 <dd>
 <div class="desc"><p>USB product id</p></div>
 </dd>
@@ -480,7 +480,7 @@ class RawInputDevice:
 <dd>
 <div class="desc"><p>Product name or <code>None</code> if unknown.</p></div>
 </dd>
-<dt id="winrawin.RawInputDevice.vendor_id"><code class="name">var <span class="ident">vendor_id</span> : int</code></dt>
+<dt id="winrawin.RawInputDevice.vendor_id"><code class="name">var <span class="ident">vendor_id</span> : Optional[int]</code></dt>
 <dd>
 <div class="desc"><p>USB vendor id</p></div>
 </dd>
