@@ -26,11 +26,11 @@ class RawInputDevice:
     """Windows handle for the device. This is valid only in the current session. For a unique identifier, use `path`."""
     path: Optional[str]
     """Unique device identifier. This string typically includes vendor and product id."""
-    vendor_id: int
+    vendor_id: Optional[int]
     """USB vendor id"""
     vendor_name: Optional[str]
     """Vendor name or `None` if unknown."""
-    product_id: int
+    product_id: Optional[int]
     """USB product id"""
     product_name: Optional[str]
     """Product name or `None` if unknown."""
